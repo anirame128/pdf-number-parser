@@ -1,59 +1,40 @@
-# PDF Number Parser
+# Largest Number Finder
 
-This tool finds the largest number in a PDF document, taking into account natural language context about units and scales (e.g., millions, billions, etc.).
+Extracts all numeric values from a PDF and prints the largest one found.
 
 ## Features
 
-- Extracts text from PDF documents
-- Finds the largest numerical value
-- Handles comma-separated numbers
-- Considers natural language context for unit multipliers
-- Filters out implausibly large values
-- Provides context around the largest number found
-
-## Requirements
-
-- Python 3.8+
-- PyPDF2
+- Handles integers, thousands-separators (`1,234`), and decimals (`3.14`).
+- Detects "values are in millions" context and scales small numbers accordingly.
+- Pure-Python; no external APIs.
+- Includes unit tests with `pytest` and test PDFs via `reportlab`.
 
 ## Installation
 
-1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/pdf-number-parser.git
-cd pdf-number-parser
-```
-
-2. Install the required dependencies:
-```bash
+git clone git@github.com:<you>/largest-number-finder.git
+cd largest-number-finder
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
 ## Usage
 
-Run the script with a PDF file as an argument:
-
 ```bash
-python pdf_number_parser.py path/to/your/document.pdf
+python find_max_number.py /path/to/your/document.pdf
+# → Largest number found: 4,554,915,000,000.00
 ```
 
-The script will output:
-- The largest number found in the document
-- The context around that number
-- Any unit multipliers applied based on the context
+## Running tests
 
-## How it Works
+```bash
+pytest
+```
 
-1. The script extracts text from the PDF using PyPDF2
-2. It finds all numerical values in the text, including comma-separated numbers
-3. Filters out implausibly large values that are likely outliers
-4. For the largest number found, it analyzes the surrounding context
-5. Determines if there are any unit multipliers (e.g., millions, billions)
-6. The final value is calculated by applying any relevant multipliers
+## How it works
 
-## Notes
-
-- The script is optimized for finding budget and financial numbers
-- Processing time is fast and efficient
-- The script handles common unit multipliers like million, billion, trillion, etc.
-- Context windows are expanded to better detect unit multipliers
+1. Uses pdfplumber to extract text page by page.
+2. Applies a regex to find all number-like strings.
+3. Normalizes them to float and keeps track of the maximum.
+4. If the text mentions "in millions," scales sub-1000 numbers by 1e6. 
